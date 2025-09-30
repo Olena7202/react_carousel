@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
 import Carousel from './components/Carousel';
 
@@ -22,60 +21,82 @@ const App: React.FC = () => {
   const [step, setStep] = useState(3);
   const [animationDuration, setAnimationDuration] = useState(1000);
 
+  useEffect(() => {
+    document.title = `Carousel — ${images.length} images`;
+  }, [images.length]);
+
+  const handleItemWidthChange = (value: string) => {
+    const v = Number(value);
+
+    setItemWidth(Number.isFinite(v) && v > 0 ? v : 130);
+  };
+
+  const handleFrameSizeChange = (value: string) => {
+    const v = Number(value);
+
+    setFrameSize(Number.isFinite(v) && v > 0 ? Math.min(v, images.length) : 3);
+  };
+
+  const handleStepChange = (value: string) => {
+    const v = Number(value);
+
+    setStep(Number.isFinite(v) && v > 0 ? Math.min(v, images.length) : 3);
+  };
+
+  const handleDurationChange = (value: string) => {
+    const v = Number(value);
+
+    setAnimationDuration(Number.isFinite(v) && v >= 0 ? v : 1000);
+  };
+
   return (
     <div className="App">
       <h1 data-cy="title">Carousel with {images.length} images</h1>
 
       <div className="controls">
         <div className="controls__group">
-          <label className="controls__label" htmlFor="itemId">
-            Item width:
-          </label>
+          <label htmlFor="itemId">Item width:</label>
           <input
             id="itemId"
             type="number"
-            className="controls__input"
+            min={1}
             value={itemWidth}
-            onChange={e => setItemWidth(+e.target.value)}
+            onChange={e => handleItemWidthChange(e.target.value)}
           />
         </div>
 
         <div className="controls__group">
-          <label className="controls__label" htmlFor="frameId">
-            Frame size:
-          </label>
+          <label htmlFor="frameId">Frame size:</label>
           <input
             id="frameId"
             type="number"
-            className="controls__input"
+            min={1}
+            max={images.length}
             value={frameSize}
-            onChange={e => setFrameSize(+e.target.value)}
+            onChange={e => handleFrameSizeChange(e.target.value)}
           />
         </div>
 
         <div className="controls__group">
-          <label className="controls__label" htmlFor="stepId">
-            Step:
-          </label>
+          <label htmlFor="stepId">Step:</label>
           <input
             id="stepId"
             type="number"
-            className="controls__input"
+            min={1}
+            max={images.length}
             value={step}
-            onChange={e => setStep(+e.target.value)}
+            onChange={e => handleStepChange(e.target.value)}
           />
         </div>
 
         <div className="controls__group">
-          <label className="controls__label" htmlFor="durationId">
-            Animation duration:
-          </label>
+          <label htmlFor="durationId">Animation duration:</label>
           <input
             id="durationId"
             type="number"
-            className="controls__input"
+            min={0}
             value={animationDuration}
-            onChange={e => setAnimationDuration(+e.target.value)}
+            onChange={e => handleDurationChange(e.target.value)}
           />
         </div>
       </div>
@@ -86,6 +107,7 @@ const App: React.FC = () => {
         frameSize={frameSize}
         step={step}
         animationDuration={animationDuration}
+        infinite={false}
       />
     </div>
   );
