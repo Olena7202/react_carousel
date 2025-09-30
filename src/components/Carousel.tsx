@@ -1,84 +1,42 @@
 import React, { useState } from 'react';
 import './Carousel.scss';
-
 type Props = {
   images: string[];
-  itemWidth?: number | string;
+  itemWidth?: number;
   frameSize?: number;
   step?: number;
   animationDuration?: number;
-  infinite?: boolean;
 };
-
 const Carousel: React.FC<Props> = ({
   images,
   itemWidth = 130,
   frameSize = 3,
   step = 3,
   animationDuration = 1000,
-  infinite = false,
 }) => {
-  const safeItemWidth =
-    typeof itemWidth === 'number' && itemWidth > 0 ? itemWidth : 130;
-  const safeFrameSize = Math.min(Math.max(frameSize, 1), images.length);
-  const safeStep = Math.min(Math.max(step, 1), images.length);
-  const safeDuration = animationDuration >= 0 ? animationDuration : 1000;
-  const maxIndex = Math.max(images.length - safeFrameSize, 0);
-
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handlePrev = () => {
-    if (infinite && currentIndex === 0) {
-      setCurrentIndex(maxIndex);
-    } else {
-      setCurrentIndex(prev => Math.max(prev - safeStep, 0));
-    }
-  };
-
-  const handleNext = () => {
-    if (infinite && currentIndex >= maxIndex) {
-      setCurrentIndex(0);
-    } else {
-      setCurrentIndex(prev => Math.min(prev + safeStep, maxIndex));
-    }
-  };
 
   return (
     <div className="Carousel">
       <div
         className="Carousel__frame"
-        style={{
-          width: `${safeItemWidth * safeFrameSize}px`,
-          height: `${safeItemWidth}px`,
-        }}
+        style={{ width: `${itemWidth * frameSize}px` }}
       >
         <ul
           className="Carousel__list"
           style={{
-            width: `${images.length * safeItemWidth}px`,
-            transform: `translateX(-${currentIndex * safeItemWidth}px)`,
-            transition: `transform ${safeDuration}ms ease`,
-            willChange: 'transform',
-            alignItems: 'center',
+            transform: `translateX(-${currentIndex * itemWidth}px)`,
+            width: `${images.length * itemWidth}px`,
+            transition: `transform ${animationDuration}ms ease`,
           }}
         >
-          {images.map((src, idx) => (
-            <li
-              key={idx}
-              className="Carousel__item"
-              style={{ width: `${safeItemWidth}px`, boxSizing: 'border-box' }}
-            >
+          {images.map((imgSrc, index) => (
+            <li key={imgSrc}>
               <img
-                src={src}
-                alt={`Slide ${idx + 1}`}
-                width={safeItemWidth} // для Cypress
-                height={safeItemWidth} // для Cypress
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
+                src={imgSrc}
+                alt={`Slide ${index + 1}`}
+                width={itemWidth}
+                height={itemWidth}
               />
             </li>
           ))}
@@ -86,19 +44,27 @@ const Carousel: React.FC<Props> = ({
       </div>
 
       <button
+        disabled={currentIndex === 0}
+        type="button"
         className="Carousel__button Carousel__button--prev"
         data-cy="prev"
-        onClick={handlePrev}
-        disabled={!infinite && currentIndex === 0}
+        onClick={() => {
+          setCurrentIndex(prev => Math.max(prev - step, 0));
+        }}
       >
         Prev
       </button>
 
       <button
+        disabled={currentIndex >= images.length - frameSize}
+        type="button"
         className="Carousel__button Carousel__button--next"
         data-cy="next"
-        onClick={handleNext}
-        disabled={!infinite && currentIndex >= maxIndex}
+        onClick={() => {
+          const maxIndex = images.length - frameSize;
+
+          setCurrentIndex(prev => Math.min(prev + step, maxIndex));
+        }}
       >
         Next
       </button>
