@@ -1,0 +1,1 @@
+.Carousel__frame{overflow:hidden}.Carousel__list{display:flex;flex-wrap:nowrap;margin:0;padding:0;list-style:none}.Carousel__item{flex:0 0 auto}.Carousel__button{margin:5px;padding:5px 10px;cursor:pointer}.Carousel__button:disabled{opacity:.5;cursor:not-allowed}
